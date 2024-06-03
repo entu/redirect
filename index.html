@@ -4,17 +4,31 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Redirecting...</title>
+  </head>
+  <body>
+    <p>Redirecting...</p>
+
     <script>
       window.addEventListener('load', async () => {
         const database = window.location.host.split('.').at(0)
-        const mid = window.location.pathname.split('-').at(1)?.split('-')?.at(0)
 
-        if(database && !/\/(public-|entity-)/.test(window.location.pathname)) {
-          window.location.href = `https://entu.app/${database}`
+        if (!database) {
+          console.error('Database is not available')
+          window.location.href = `https://entu.app`
+          return
         }
 
-        if (!database || !mid) {
-          console.error('Database or mid is not available')
+        if(!/\/(public-|entity-)/.test(window.location.pathname)) {
+          console.error('No entity ID in URL path')
+          window.location.href = `https://entu.app/${database}`
+          return
+        }
+
+        const mid = window.location.pathname.split('-').at(1)?.split('-')?.at(0)
+
+        if (!mid) {
+          console.error('Entity ID is not available')
+          window.location.href = `https://entu.app/${database}`
           return
         }
 
@@ -22,18 +36,20 @@
 
         if (!response.ok) {
           console.error('Network response was not ok')
-
           window.location.href = `https://entu.app/${database}`
           return
         }
 
         const { entities } = await response.json()
 
+        if (!entities || !entities.length) {
+          console.error('Entity not found')
+          window.location.href = `https://entu.app/${database}`
+          return
+        }
+
         window.location.href = `https://entu.app/${database}/${entities.at(0)._id}`
       })
     </script>
-  </head>
-  <body>
-    <p>Redirecting...</p>
   </body>
 </html>
