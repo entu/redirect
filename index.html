@@ -26,7 +26,7 @@
           return
         }
 
-        const mid = pathname.split('-').at(1)?.split('-')?.at(0)
+        const mid = pathname.split('/').at(2)?.split('-')?.at(1)
 
         if (!mid) {
           console.error('Entity ID is not available')
