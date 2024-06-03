@@ -11,25 +11,27 @@
 
     <script>
       window.addEventListener('load', async () => {
-        const database = window.location.host.split('.').at(0)
+        const { host, pathname } = window.location
+        const database = host.split('.').at(0)
+        const ref = `ref=${host}${pathname}`
 
         if (!database) {
           console.error('Database is not available')
-          window.location.href = `https://entu.app`
+          window.location.href = `https://entu.app?${ref}`
           return
         }
 
-        if(!/\/(public-|entity-)/.test(window.location.pathname)) {
+        if(!/\/(public-|entity-)/.test(pathname)) {
           console.error('No entity ID in URL path')
-          window.location.href = `https://entu.app/${database}`
+          window.location.href = `https://entu.app/${database}?${ref}`
           return
         }
 
-        const mid = window.location.pathname.split('-').at(1)?.split('-')?.at(0)
+        const mid = pathname.split('-').at(1)?.split('-')?.at(0)
 
         if (!mid) {
           console.error('Entity ID is not available')
-          window.location.href = `https://entu.app/${database}`
+          window.location.href = `https://entu.app/${database}?${ref}`
           return
         }
 
@@ -37,7 +39,7 @@
 
         if (!response.ok) {
           console.error('Network response was not ok')
-          window.location.href = `https://entu.app/${database}`
+          window.location.href = `https://entu.app/${database}?${ref}`
           return
         }
 
@@ -45,11 +47,11 @@
 
         if (!entities || !entities.length) {
           console.error('Entity not found')
-          window.location.href = `https://entu.app/${database}`
+          window.location.href = `https://entu.app/${database}?${ref}`
           return
         }
 
-        window.location.href = `https://entu.app/${database}/${entities.at(0)._id}`
+        window.location.href = `https://entu.app/${database}/${entities.at(0)._id}?${ref}`
       })
     </script>
   </body>
