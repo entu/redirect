@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+  <html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Redirecting...</title>
+    <script>
+      window.addEventListener('load', async () => {
+        const database = window.location.host.split('.').at(0)
+        const mid = window.location.pathname.split('-').at(1)?.split('-')?.at(0)
+
+        if(database && !/\/(public-|entity-)/.test(window.location.pathname)) {
+          window.location.href = `https://entu.app/${database}`
+        }
+
+        if (!database || !mid) {
+          console.error('Database or mid is not available')
+          return
+        }
+
+        const response = await fetch(`https://entu.app/api/${database}/entity?_mid.string=${mid}&props=_id`)
+
+        if (!response.ok) {
+          console.error('Network response was not ok')
+
+          window.location.href = `https://entu.app/${database}`
+          return
+        }
+
+        const { entities } = await response.json()
+
+        window.location.href = `https://entu.app/${database}/${entities.at(0)._id}`
+      })
+    </script>
+  </head>
+  <body>
+    <p>Redirecting...</p>
+  </body>
+</html>
