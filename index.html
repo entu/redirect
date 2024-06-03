@@ -13,7 +13,7 @@
       window.addEventListener('load', async () => {
         const { host, pathname } = window.location
         const database = host.split('.').at(0)
-        const ref = `ref=${host}${pathname}`
+        const ref = `ref=https://${host}${pathname}`
 
         if (!database) {
           console.error('Database is not available')
