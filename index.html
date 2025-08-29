@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Redirecting...</title>
+    <title>Ümbersuunamine...</title>
     <script src="https://analytics.entu.dev/ea.min.js" data-site="redirect.entu.ee" crossorigin="anonymous" defer></script>
     <style>
       body {
@@ -36,10 +36,10 @@
     </style>
   </head>
   <body>
-    <p class="redirect-message">Redirecting in <span id="countdown">9</span> seconds...</p>
+    <p class="redirect-message">Suunan ümber <span id="countdown">9</span> sekundi pärast...</p>
     
     <div class="notice">
-      <p>This address will be discontinued in the near future. Please update your bookmarks to the new address: <a class="new-domain" id="newDomain" href="https://entu.app">https://entu.app</a></p>
+      <p>Aadress (<span id="currentDomain">entu.ee</span>) suletakse lähitulevikus. Palun uuenda oma järjehoidjad uuele aadressile: <a class="new-domain" id="newDomain" href="https://entu.app">https://entu.app</a></p>
     </div>
 
     <script>
@@ -79,15 +79,21 @@
         const { host, pathname } = window.location
         const database = host.split('.').at(0)
 
+        // Update the current domain placeholder
+        const currentDomainElement = document.getElementById('currentDomain')
+        if (currentDomainElement) {
+          currentDomainElement.textContent = host
+        }
+
         if (!database) {
-          console.log('No database found, redirecting to entu.app')
+          console.log('Andmebaasi ei leitud, suunan entu.app-i')
           // Use countdown even for error redirects for testing
           startCountdown('https://entu.app')
           return
         }
 
         if(!/\/(public-|entity-)/.test(pathname)) {
-          console.log('No entity ID in URL path, redirecting to database home')
+          console.log('URL-is puudub üksuse ID, suunan andmebaasi avalehele')
           startCountdown(`https://entu.app/${database}`)
           return
         }
@@ -95,16 +101,16 @@
         const mid = pathname.split('/').at(2)?.split('-')?.at(1)
 
         if (!mid) {
-          console.log('Entity ID not available, redirecting to database home')
+          console.log('Üksuse ID ei ole saadaval, suunan andmebaasi avalehele')
           startCountdown(`https://entu.app/${database}`)
           return
         }
 
-        console.log('Fetching entity with mid:', mid)
+        console.log('Laen üksust ID-ga:', mid)
         const response = await fetch(`https://entu.app/api/${database}/entity?_mid.string=${mid}&props=_id`)
 
         if (!response.ok) {
-          console.log('Network response was not ok, redirecting to database home')
+          console.log('Võrguühenduse viga, suunan andmebaasi avalehele')
           startCountdown(`https://entu.app/${database}`)
           return
         }
@@ -112,15 +118,15 @@
         const { entities } = await response.json()
 
         if (!entities || !entities.length) {
-          console.log('Entity not found, redirecting to database home')
+          console.log('Üksust ei leitud, suunan andmebaasi avalehele')
           startCountdown(`https://entu.app/${database}`)
           return
         }
 
         // Start countdown for successful redirect
-        console.log('Entity found, starting countdown')
+        console.log('Üksus leitud, alustan taimerit')
         const finalUrl = `https://entu.app/${database}/${entities.at(0)._id}`
-        window.analytics.track('redirect', { url: finalUrl, message: 'Successful redirect with countdown' })
+        window.analytics.track('redirect', { url: finalUrl, message: 'Edukas ümbersuunamine taimeriga' })
         startCountdown(finalUrl)
       })
     </script>
