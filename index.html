@@ -97,13 +97,6 @@
           currentDomainElement.textContent = host
         }
 
-        // Update the new domain link
-        const newDomainElement = document.getElementById('newDomain')
-        if (newDomainElement && database) {
-          newDomainElement.textContent = `${database}.entu.app`
-          newDomainElement.href = `https://${database}.entu.app`
-        }
-
         if (!database) {
           console.log('Andmebaasi ei leitud, suunan entu.app-i')
           startCountdown('https://entu.app')
