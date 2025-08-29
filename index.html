@@ -10,36 +10,40 @@
         margin: 0;
         padding: 0;
         height: 100vh;
+        background-color: #f5f5f5;
         display: flex;
         flex-direction: column;
         justify-content: center;
         align-items: center;
         font-family: Arial, sans-serif;
-        background-color: #f5f5f5;
       }
       .redirect-message {
+        margin-bottom: 1rem;
+        color: #0066cc;
         font-size: 1.5rem;
         font-weight: bold;
-        color: #0066cc;
         text-align: center;
-        margin-bottom: 1rem;
       }
       .notice {
         max-width: 600px;
         padding: 0 1rem;
         text-align: center;
       }
-      .new-domain {
+      #currentDomain {
+        text-decoration: underline;
+      }
+      #newDomain {
         font-weight: bold;
         color: #0066cc;
+        text-decoration: underline;
       }
     </style>
   </head>
   <body>
-    <p class="redirect-message">Suunan ümber <span id="countdown">9</span> sekundi pärast...</p>
+    <div class="redirect-message">Suunan ümber <span id="countdown">9</span> sekundi pärast...</div>
     
     <div class="notice">
-      <p>Aadress (<span id="currentDomain">entu.ee</span>) suletakse lähitulevikus. Palun uuenda oma järjehoidjad uuele aadressile: <a class="new-domain" id="newDomain" href="https://entu.app">https://entu.app</a></p>
+      Aadress <span id="currentDomain">entu.ee</span> suletakse lähitulevikus. Uus aadress on <a id="newDomain" href="https://entu.app">entu.app</a>. Palun uuenda oma järjehoidjad!
     </div>
 
     <script>
@@ -58,6 +62,14 @@
           
           if (timeLeft < 0) {
             clearInterval(countdownTimer)
+            
+            // Track analytics just before redirect
+            if (window.analytics && typeof window.analytics.track === 'function') {
+              window.analytics.track('redirect', { url: redirectUrl, message: 'Countdown completed redirect' })
+            } else {
+              console.log('Analytics not available, redirect data:', { url: redirectUrl, message: 'Countdown completed redirect' })
+            }
+            
             window.location.href = redirectUrl
           }
         }, 1000)
@@ -75,7 +87,7 @@
         window.location.href = url
       }
 
-      window.addEventListener('load', async () => {
+      window.addEventListener('DOMContentLoaded', async () => {
         const { host, pathname } = window.location
         const database = host.split('.').at(0)
 
@@ -85,9 +97,15 @@
           currentDomainElement.textContent = host
         }
 
+        // Update the new domain link
+        const newDomainElement = document.getElementById('newDomain')
+        if (newDomainElement && database) {
+          newDomainElement.textContent = `${database}.entu.app`
+          newDomainElement.href = `https://${database}.entu.app`
+        }
+
         if (!database) {
           console.log('Andmebaasi ei leitud, suunan entu.app-i')
-          // Use countdown even for error redirects for testing
           startCountdown('https://entu.app')
           return
         }
